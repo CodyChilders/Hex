@@ -1,0 +1,55 @@
+Cody Childers
+cchilder
+
+I worked with:
+Kyle Sullivan
+kyrsulli@ucsc.edu
+
+Makefile Options:
+
+make run
+This compiles and runs the game, waiting for your input.
+
+make test
+This compiles and runs the game, using our supplied 'quickgame' file as
+user input.  It makes it much faster to play a game to conclusion for
+rapid testing.
+
+What I learned:
+I learned that mem-leaks are a more serious problem than I ever realized. We had
+a long time where we were unable to test the AI because our mem-leaks were stacking
+up so quickly that Unix was killing the program.  After some research, we learned
+that calling delete too many times (oops) was causing it to accumulate too much
+memory.  We went on a mem-leak crusade and got it down to something like 36
+bytes.  I also learned a lot about the Monte Carlo AI system.  I like the idea
+of random sampling the game tree, because convergence is a lot easier to calculate
+than an optimal strategy.  I also realized that an entire game tree would be too
+much to build and manage efficiently, especially with the root (empty board)
+having 121/169 children, and they have 121/169 children, and they have 120/168 children
+and so on.  I had a blast learning and playing a lot of games of Hex as I tested
+out strategies, and finally implemented the most successful (described below).
+I also learned how playing the game randomly and recursively just using
+random ints (instead of managing nodes in a tree) is still transversing the 
+game tree, its just picking random branches as it goes down, and doing
+it without a tree is far easier on memory and far faster.  I also had fun 
+taking my AI debug statements and turning them into "Thinking...", just to remind the
+user that the computer is still good and it'll be back in a moment.
+
+Notes on the implementation of AI:
+The AI works by a combination of Monte Carlo decision making and a simple,
+top level decision algorithm to drastically cut the search space.  This is
+accomplished by some studying on Hex strategies.  It first tries to grab the 
+center tile on the board, and if the player takes that tile from him using the
+pie rule, it grabs one in the middle, randomly 2 to the left or right.  From 
+there, it tries to make as many "advancing moves" as it can.  We use this term
+in code to refer to the hexes that are not adjacent, but connected by 2 common 
+adjacent hexes.  Once it has grabbed all of those (or as many as it could get),
+it then proceedes to make what we call "connecting moves".  It tries to make no
+more than 1 connecting move in each row, because more than 1 would be unnecessary.
+At both stages, which advancing move and which connecting move are chosen is 
+determined by a Monte Carlo sampling of the entire game tree.  Depending on the
+AI difficulty set by the user, it plays from a few hundred to 1500 different games,
+keeping track of how many wins it got in each potential move, and picking the
+most successful.  If it was unable to make any of its optimal moves, it starts 
+picking random moves.  It actually wins fairly often, even after resorting to this.
+
